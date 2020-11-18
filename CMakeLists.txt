@@ -56,7 +56,8 @@ include("${CINDER_PATH}/proj/cmake/modules/cinderMakeApp.cmake")
 
 list(APPEND CORE_SOURCE_FILES src/core/image.cc src/core/pixel.cc)
 
-list(APPEND SOURCE_FILES    ${CORE_SOURCE_FILES} src/visualizer/geometric_primitives_app.cpp src/visualizer/renderer.cc)
+list(APPEND SOURCE_FILES    ${CORE_SOURCE_FILES} src/visualizer/geometric_primitives_app.cpp src/visualizer/renderer.cc
+        src/visualizer/rectangle.cc)
 
 #list(APPEND TEST_FILES )                                       tests
 

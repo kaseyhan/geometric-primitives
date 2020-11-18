@@ -16,8 +16,8 @@ void Rectangle::Draw() {
 void Rectangle::Mutate() {
 }
 
-glm::vec2 Rectangle::GetTopLeftCorner() const { return top_left_corner_; }
-void Rectangle::SetTopLeftCorner(glm::vec2 &new_corner) { top_left_corner_ = new_corner; }
+glm::vec2 Rectangle::GetLocation() const { return top_left_corner_; }
+void Rectangle::SetLocation(glm::vec2 &new_corner) { top_left_corner_ = new_corner; }
 
 
 }

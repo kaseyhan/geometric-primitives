@@ -4,6 +4,7 @@
 
 namespace geometricprimitives {
 
+Image::Image() {}
 std::vector<std::vector<Pixel>> Image::GetPixelArray() const { return pixel_array_; }
 
 }
