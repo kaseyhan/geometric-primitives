@@ -4,7 +4,11 @@ namespace geometricprimitives {
 namespace visualizer {
 
 GeometricPrimitivesApp::GeometricPrimitivesApp() {
-  // instantiate renderer
+  ci::app::setWindowSize((int) kWindowSize, (int) kWindowSize);
+}
+
+void GeometricPrimitivesApp::update() {
+  renderer_.AddShape();
 }
 
 void GeometricPrimitivesApp::draw() {

@@ -18,15 +18,18 @@ Renderer::Renderer(Image& original) : original_image_(original){
   background_color_ = CalculateBackgroundColor();
 }
 
-void Renderer::Render() {
+void Renderer::AddShape() {
   double rms = std::numeric_limits<double>::max();
+  Shape* shape;
   do {
-    Shape* shape = GenerateRandomShape();
+    Shape* random_shape = GenerateRandomShape();
     double new_rms = CalculateRootMeanSquare();
     if (new_rms < rms) {
       rms = new_rms;
+      shape = random_shape;
     }
-  } while (rms > 10);    //CHANGE
+  } while (rms > kMinError);
+  shapes_.push_back(*shape);
 }
 
 ci::Color8u Renderer::CalculateBackgroundColor() {
@@ -69,6 +72,9 @@ void Renderer::draw() {
   ci::gl::color(background_color_);
   ci::Rectf background(top_left_corner_, top_left_corner_ + glm::vec2(kWindowSize, kWindowSize));
   ci::gl::drawSolidRect(background);
+  for (size_t i = 0; i < shapes_.size(); i++) {
+    shapes_[i].Draw();
+  }
 }
 
 double Renderer::CalculateRootMeanSquare() const {

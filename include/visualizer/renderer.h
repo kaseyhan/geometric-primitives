@@ -16,10 +16,10 @@ public:
   Renderer(Image& original);
 
   void draw();
-  void Render();
+  //void Render();
 
   /*
-   * Generates random shapes until it creates one that
+   * Generates random shapes until it creates one that has minimal error
    */
   void AddShape();
 
@@ -27,6 +27,7 @@ public:
   const float kMaxDimension = 200;
 
 private:
+  const double kMinError = 10;          // CHANGE
   ci::Color8u CalculateBackgroundColor();
   Shape* GenerateRandomShape() const;
   double CalculateRootMeanSquare() const;
