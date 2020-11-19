@@ -1,4 +1,5 @@
 #include <visualizer/geometric_primitives_app.h>
+#include <lodepng/lodepng.h>
 
 namespace geometricprimitives {
 namespace visualizer {
