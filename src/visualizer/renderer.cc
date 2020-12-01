@@ -96,5 +96,6 @@ double Renderer::CalculateRootMeanSquare() const {
   return rms;
 }
 
+void Renderer::SetOriginalImage(Image &original) { original_image_ = original; }
 }
 }

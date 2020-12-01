@@ -22,6 +22,7 @@ public:
    * Generates random shapes until it creates one that has minimal error
    */
   void AddShape();
+  void SetOriginalImage(Image& original);
 
   const float kWindowSize = 600;
   const float kMaxDimension = 200;

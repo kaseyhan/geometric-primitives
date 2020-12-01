@@ -10,7 +10,9 @@ set(CMAKE_BUILD_TYPE Debug)
 # Let's ensure -std=c++xx instead of -std=g++xx
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/lodepng")
+#LodePNG
+SET(LODE_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/lodepng")
+INCLUDE_DIRECTORIES ("${LODE_INCLUDE_DIR}")
 
 # Let's nicely support folders in IDE's
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
@@ -59,7 +61,9 @@ include("${CINDER_PATH}/proj/cmake/modules/cinderMakeApp.cmake")
 list(APPEND CORE_SOURCE_FILES src/core/image.cc src/core/pixel.cc)
 
 list(APPEND SOURCE_FILES    ${CORE_SOURCE_FILES} src/visualizer/geometric_primitives_app.cpp src/visualizer/renderer.cc
-        src/visualizer/rectangle.cc lodepng/lodepng.cpp)
+        src/visualizer/rectangle.cc)
+
+list(APPEND ${LODE_INCLUDE_DIR}/lodepng.cpp)
 
 #list(APPEND TEST_FILES )                                       tests
 

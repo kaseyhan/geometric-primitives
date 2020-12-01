@@ -15,6 +15,9 @@ public:
   void update() override;
   void draw() override;
 
+  void UploadImage(const char* filename);
+  std::vector<unsigned char> decodeOneStep(const char* filename);
+
   const float kWindowSize = 600;
 
 private:

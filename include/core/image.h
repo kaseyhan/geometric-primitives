@@ -13,6 +13,7 @@ public:
   Image(vector<vector<Pixel>>& pix_array);
 
   vector<vector<Pixel>> GetPixelArray() const;
+  void AddPixelRow(vector<Pixel>& row);
 
 private:
   vector<vector<Pixel>> pixel_array_;
