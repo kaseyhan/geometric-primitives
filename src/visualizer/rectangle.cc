@@ -4,10 +4,11 @@
 namespace geometricprimitives {
 namespace visualizer {
 
-Rectangle::Rectangle(glm::vec2 &corner, float length, float width, ci::Color8u &color) : top_left_corner_(corner),
+Rectangle::Rectangle(glm::vec2 &corner, float length, float width, ci::ColorA &color) : top_left_corner_(corner),
                       width_(width), length_(length), color_(color) { }
 
 void Rectangle::Draw() {
+  ci::gl::enableAlphaBlending();
   ci::gl::color(color_);
   ci::Rectf rectangle(top_left_corner_, top_left_corner_ + glm::vec2(width_, length_));
   ci::gl::drawSolidRect(rectangle);

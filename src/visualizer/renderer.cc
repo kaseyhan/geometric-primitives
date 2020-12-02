@@ -32,25 +32,23 @@ void Renderer::AddShape() {
   shapes_.push_back(shape);
 }
 
-ci::Color8u Renderer::CalculateBackgroundColor() {
-  vector<vector<Pixel>> pixels = original_image_.GetPixelArray();
+ci::ColorA Renderer::CalculateBackgroundColor() {
+  vector<Pixel> pixels = original_image_.GetPixelArray();
 
-  int red_total = 0;
-  int green_total = 0;
-  int blue_total = 0;
+  float red_total = 0;
+  float green_total = 0;
+  float blue_total = 0;
 
-  for (vector<Pixel>& row : pixels) {
-    for (Pixel& pix : row) {
+  for (Pixel& pix : pixels) {
       red_total += pix.GetRed();
       green_total += pix.GetGreen();
       blue_total += pix.GetBlue();
-    }
   }
-  size_t num_pixels = pixels.size() * pixels[0].size();
-  int avg_red = red_total / num_pixels;
-  int avg_green = green_total / num_pixels;
-  int avg_blue = blue_total / num_pixels;
-  ci::Color8u background_color(avg_red, avg_green, avg_blue);
+
+  float avg_red = red_total / pixels.size();
+  float avg_green = green_total / pixels.size();
+  float avg_blue = blue_total / pixels.size();
+  ci::ColorA background_color(avg_red, avg_green, avg_blue, 1);
   return background_color;
 }
 
@@ -59,10 +57,10 @@ Shape* Renderer::GenerateRandomShape() const {
   std::uniform_real_distribution<float> loc_y(0,kWindowSize);
   std::uniform_real_distribution<float> width(0,kMaxDimension);
   std::uniform_real_distribution<float> length(0,kMaxDimension);
-  std::uniform_real_distribution<float> rgb_value(0,255);
+  std::uniform_real_distribution<float> rgb_value(0,1);
   std::default_random_engine generator;
   glm::vec2 loc(loc_x(generator), loc_y(generator));
-  ci::Color8u color((int)rgb_value(generator), (int)rgb_value(generator), (int)rgb_value(generator));
+  ci::ColorA color(rgb_value(generator), rgb_value(generator), rgb_value(generator), kAlpha);
 
   //Rectangle rect(loc, length(generator), width(generator), color);
   return new Rectangle(loc, length(generator), width(generator), color);
@@ -78,24 +76,28 @@ void Renderer::draw() {
 }
 
 double Renderer::CalculateRootMeanSquare() const {
-  vector<vector<Pixel>> orig_pixels = original_image_.GetPixelArray();
-  vector<vector<Pixel>> new_pixels = generated_image_.GetPixelArray();
+  vector<Pixel> orig_pixels = original_image_.GetPixelArray();
+  vector<Pixel> new_pixels = generated_image_.GetPixelArray();
 //  double total_red_error = 0;
 //  double total_green_error = 0;
 //  double total_blue_error = 0;
   double total_error = 0;
-  size_t total_num = orig_pixels.size() * orig_pixels[0].size();
-  for (size_t row = 0; row < orig_pixels.size(); row++) {
-    for (size_t col = 0; col < orig_pixels[0].size(); col++) {
-      total_error += std::pow(std::abs(new_pixels[row][col].GetRed() - orig_pixels[row][col].GetRed()),2);
-      total_error += std::pow(std::abs(new_pixels[row][col].GetGreen() - orig_pixels[row][col].GetGreen()),2);
-      total_error += std::pow(std::abs(new_pixels[row][col].GetBlue() - orig_pixels[row][col].GetBlue()),2);
-    }
+  for (size_t i = 0; i < orig_pixels.size(); i++) {
+      total_error += std::pow(std::abs(new_pixels[i].GetRed() - orig_pixels[i].GetRed()),2);
+      total_error += std::pow(std::abs(new_pixels[i].GetGreen() - orig_pixels[i].GetGreen()),2);
+      total_error += std::pow(std::abs(new_pixels[i].GetBlue() - orig_pixels[i].GetBlue()),2);
   }
-  double rms = std::pow(total_error / total_num, .5);
+
+  double rms = std::pow(total_error / orig_pixels.size(), .5);
   return rms;
 }
 
 void Renderer::SetOriginalImage(Image &original) { original_image_ = original; }
+
+void Renderer::Clear() {
+  for (size_t i = 0; i < shapes_.size(); i++) {
+    delete shapes_[i];
+  }
+}
 }
 }

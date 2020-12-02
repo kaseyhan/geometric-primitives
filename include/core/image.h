@@ -10,13 +10,13 @@ using std::vector;
 class Image {
 public:
   Image();
-  Image(vector<vector<Pixel>>& pix_array);
+  Image(vector<Pixel>& pix_array);
 
-  vector<vector<Pixel>> GetPixelArray() const;
-  void AddPixelRow(vector<Pixel>& row);
+  vector<Pixel> GetPixelArray() const;
+  void SetPixelArray(vector<Pixel>& pix_array);
 
 private:
-  vector<vector<Pixel>> pixel_array_;
+  vector<Pixel> pixel_array_;
 };
 
 }

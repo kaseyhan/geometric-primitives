@@ -1,4 +1,7 @@
 #include <visualizer/geometric_primitives_app.h>
+#include <core/pixel.h>
+#include <visualizer/renderer.h>
+#include <core/image.h>
 #include <lodepng.h>
 
 namespace geometricprimitives {
@@ -6,37 +9,41 @@ namespace visualizer {
 
 GeometricPrimitivesApp::GeometricPrimitivesApp() {
   ci::app::setWindowSize((int) kWindowSize, (int) kWindowSize);
+  UploadImage(kFilePath);
 }
 
 void GeometricPrimitivesApp::update() {
-  renderer_.AddShape();
+  //renderer_.AddShape();
 }
 
 void GeometricPrimitivesApp::draw() {
-  renderer_.draw();
+  ci::gl::enableAlphaBlending();
+  //renderer_.draw();
 }
 
-void GeometricPrimitivesApp::UploadImage(const char* filename) {
-  Image image;
-  std::vector<unsigned char> raw_pixels = decodeOneStep(filename);
-  for (size_t i = 0; i < raw_pixels.size(); i += 4) {
-    Pixel pixel((int)raw_pixels[i], (int)raw_pixels[i+1], (int)raw_pixels[i+2]);
-
+void GeometricPrimitivesApp::UploadImage(const char* file_path) {
+  std::vector<unsigned char> raw_pixels = DecodeOneStep(file_path);
+  std::vector<Pixel> pixels;
+  for (size_t i = 0; i < raw_pixels.size()-4; i += 4) {
+    Pixel pixel((float)raw_pixels[i], (float)raw_pixels[i+1], (float)raw_pixels[i+2], (float)raw_pixels[i+3]);      // DIVIDE BY 255?
+    pixels.push_back(pixel);
   }
+  Image image(pixels);
+  renderer_.SetOriginalImage(image);
 }
 
-std::vector<unsigned char> decodeOneStep(const char* filename) {
-  std::vector<unsigned char> image; //the raw pixels
+std::vector<unsigned char> GeometricPrimitivesApp::DecodeOneStep(const char* file_path) {
+  std::vector<unsigned char> pixels; //the raw pixels
   unsigned width, height;
 
   //decode
-  unsigned error = lodepng::decode(image, width, height, filename);
+  unsigned error = lodepng::decode(pixels, width, height, file_path);
 
   //if there's an error, display it
   if(error) std::cout << "decoder error " << error << ": " << lodepng_error_text(error) << std::endl;
 
-  //the pixels are now in the vector "image", 4 bytes per pixel, ordered RGBARGBA..., use it as texture, draw it, ...
-  return image;
+  //the pixels are now in the vector "pixels", 4 bytes per pixel, ordered RGBARGBA
+  return pixels;
 }
 
 }

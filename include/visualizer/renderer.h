@@ -23,19 +23,21 @@ public:
    */
   void AddShape();
   void SetOriginalImage(Image& original);
+  void Clear();
 
   const float kWindowSize = 600;
   const float kMaxDimension = 200;
   const double kMinError = 10;          // CHANGE
+  const float kAlpha = 0.5;             // CHANGE?
 
 private:
-  ci::Color8u CalculateBackgroundColor();
+  ci::ColorA CalculateBackgroundColor();
   Shape* GenerateRandomShape() const;
   double CalculateRootMeanSquare() const;
   Image original_image_;
   Image generated_image_;
   std::vector<Shape*> shapes_;
-  ci::Color8u background_color_;
+  ci::ColorA background_color_;
   glm::vec2 top_left_corner_ = glm::vec2(0,0);
 };
 }
