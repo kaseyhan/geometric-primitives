@@ -15,37 +15,47 @@ GeometricPrimitivesApp::GeometricPrimitivesApp() {
 }
 
 void GeometricPrimitivesApp::update() {
-  //renderer_.AddShape();
+  renderer_.AddShape();
 }
 
 void GeometricPrimitivesApp::draw() {
   ci::gl::enableAlphaBlending();
-  //renderer_.draw();
+  renderer_.draw();
 }
 
 void GeometricPrimitivesApp::UploadImage(const std::string& file_path) {
-  std::vector<unsigned char> raw_pixels = DecodeOneStep(file_path);
-  std::vector<Pixel> pixels;
-  for (size_t i = 0; i < raw_pixels.size()-4; i += 4) {
-    Pixel pixel((float)raw_pixels[i], (float)raw_pixels[i+1], (float)raw_pixels[i+2], (float)raw_pixels[i+3]);      // DIVIDE BY 255?
-    pixels.push_back(pixel);
-  }
+  std::vector<std::vector<Pixel>> pixels = DecodeImage(file_path);
   Image image(pixels);
   renderer_.SetOriginalImage(image);
 }
 
-std::vector<unsigned char> GeometricPrimitivesApp::DecodeOneStep(const std::string& file_path) {
-  std::vector<unsigned char> pixels; //the raw pixels
+std::vector<std::vector<Pixel>> GeometricPrimitivesApp::DecodeImage(const std::string& file_path) {
+  std::vector<unsigned char> raw; //the raw pixels
   unsigned width, height;
 
   //decode
-  auto error = lodepng::decode(pixels, width, height, file_path);
+  auto error = lodepng::decode(raw, width, height, file_path);
 
   //if there's an error, display it
   if(error) std::cout << "decoder error " << error << ": " << lodepng_error_text(error) << std::endl;
 
   //the pixels are now in the vector "pixels", 4 bytes per pixel, ordered RGBARGBA
-  return pixels;
+
+  std::vector<std::vector<Pixel>> pixels_2d;
+  size_t index = 0;
+
+  for (size_t row_idx = 0; row_idx < height; row_idx++) {
+    std::vector<Pixel> row;
+    for (size_t col_idx = 0; col_idx < width; col_idx++) {
+      Pixel pixel((float)raw[index]/255, (float)raw[index+1]/255,
+                  (float)raw[index+2]/255, (float)raw[index+3]/255);
+      row.push_back(pixel);
+      index += 4;
+    }
+    pixels_2d.push_back(row);
+  }
+
+  return pixels_2d;
 }
 
 }

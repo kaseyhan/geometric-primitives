@@ -20,6 +20,7 @@ public:
   void SetGreen(float new_green);
   void SetBlue(float new_blue);
   void SetAlpha(float new_alpha);
+  void SetRGBA(float r, float g, float b, float a);
   void SetLocation(glm::vec2 new_loc);
 
 private:

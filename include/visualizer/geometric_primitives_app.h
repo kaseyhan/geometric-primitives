@@ -20,7 +20,7 @@ public:
    */
   void UploadImage(const std::string& filename);
 
-  std::vector<unsigned char> DecodeOneStep(const std::string& file_path);
+  std::vector<std::vector<Pixel>> DecodeImage(const std::string& file_path);
 
   const float kWindowSize = 600;
   const std::string kFilePath = "C:\\Users\\kjhan\\Desktop\\cinder_0.9.2_vc2015\\my-projects\\final-project-kaseyhan\\default_image.png";

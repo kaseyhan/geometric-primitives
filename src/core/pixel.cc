@@ -15,5 +15,11 @@ void Pixel::SetRed(float new_red) { red_ = new_red; }
 void Pixel::SetGreen(float new_green) { green_ = new_green; }
 void Pixel::SetBlue(float new_blue) { blue_ = new_blue; }
 void Pixel::SetAlpha(float new_alpha) { alpha_ = new_alpha; }
+void Pixel::SetRGBA(float r, float g, float b, float a) {
+  red_ = r;
+  green_ = g;
+  blue_ = b;
+  alpha_ = a;
+}
 
 }
