@@ -18,12 +18,12 @@ public:
   /**
    * Takes the image in the specified file and adds it to the renderer as an Image with a 1D vector of Pixels
    */
-  void UploadImage(const char* filename);
+  void UploadImage(const std::string& filename);
 
-  std::vector<unsigned char> DecodeOneStep(const char* file_path);
+  std::vector<unsigned char> DecodeOneStep(const std::string& file_path);
 
   const float kWindowSize = 600;
-  const char* kFilePath = "default_image.png";
+  const std::string kFilePath = "C:\\Users\\kjhan\\Desktop\\cinder_0.9.2_vc2015\\my-projects\\final-project-kaseyhan\\default_image.png";
 
 private:
   Renderer renderer_;

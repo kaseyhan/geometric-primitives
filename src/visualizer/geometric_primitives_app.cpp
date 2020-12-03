@@ -3,6 +3,8 @@
 #include <visualizer/renderer.h>
 #include <core/image.h>
 #include <lodepng.h>
+#pragma warning(disable:4700)
+
 
 namespace geometricprimitives {
 namespace visualizer {
@@ -21,7 +23,7 @@ void GeometricPrimitivesApp::draw() {
   //renderer_.draw();
 }
 
-void GeometricPrimitivesApp::UploadImage(const char* file_path) {
+void GeometricPrimitivesApp::UploadImage(const std::string& file_path) {
   std::vector<unsigned char> raw_pixels = DecodeOneStep(file_path);
   std::vector<Pixel> pixels;
   for (size_t i = 0; i < raw_pixels.size()-4; i += 4) {
@@ -32,12 +34,12 @@ void GeometricPrimitivesApp::UploadImage(const char* file_path) {
   renderer_.SetOriginalImage(image);
 }
 
-std::vector<unsigned char> GeometricPrimitivesApp::DecodeOneStep(const char* file_path) {
+std::vector<unsigned char> GeometricPrimitivesApp::DecodeOneStep(const std::string& file_path) {
   std::vector<unsigned char> pixels; //the raw pixels
   unsigned width, height;
 
   //decode
-  unsigned error = lodepng::decode(pixels, width, height, file_path);
+  auto error = lodepng::decode(pixels, width, height, file_path);
 
   //if there's an error, display it
   if(error) std::cout << "decoder error " << error << ": " << lodepng_error_text(error) << std::endl;

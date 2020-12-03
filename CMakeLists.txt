@@ -20,7 +20,7 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 # Warning flags
 if(MSVC)
     # warning level 3 and all warnings as errors
-    add_compile_options(/W3 /WX)
+    add_compile_options(/W3)
     add_compile_options(
             $<$<CONFIG:>:/MT> #---------|
             $<$<CONFIG:Debug>:/MTd> #---|-- Statically link the runtime libraries
@@ -63,7 +63,7 @@ list(APPEND CORE_SOURCE_FILES src/core/image.cc src/core/pixel.cc)
 list(APPEND SOURCE_FILES    ${CORE_SOURCE_FILES} src/visualizer/geometric_primitives_app.cpp src/visualizer/renderer.cc
         src/visualizer/rectangle.cc)
 
-list(APPEND ${LODE_INCLUDE_DIR}/lodepng.cpp)
+list(APPEND SOURCE_FILES    ${LODE_INCLUDE_DIR}/lodepng.cpp)
 
 #list(APPEND TEST_FILES )                                       tests
 
