@@ -16,16 +16,9 @@ using std::vector;
 Renderer::Renderer() {}
 Renderer::Renderer(Image& original) : original_image_(original){
   background_color_ = CalculateBackgroundColor();
-
-  std::vector<std::vector<Pixel>> blank_pixels;
-  for (size_t i = 0; i < original.GetPixelArray().size(); i++) {
-    std::vector<Pixel> row;
-    for (size_t j = 0; j < original.GetPixelArray()[0].size(); j++) {
-      Pixel pixel(0,0,0,0);
-      row.push_back(pixel);
-    }
-    blank_pixels.push_back(row);
-  }
+  std::vector<std::vector<Pixel>> blank_pixels(original.GetPixelArray().size(),
+                                               std::vector<Pixel>(original.GetPixelArray()[0].size(),
+                                                                  Pixel(0,0,0,0)));
   generated_image_.SetPixelArray(blank_pixels);
 }
 
@@ -50,14 +43,13 @@ ci::ColorA Renderer::CalculateBackgroundColor() {
   float green_total = 0;
   float blue_total = 0;
 
-  for (vector<Pixel> row : pixels) {
+  for (vector<Pixel>& row : pixels) {
     for (Pixel& pix : row) {
       red_total += pix.GetRed();
       green_total += pix.GetGreen();
       blue_total += pix.GetBlue();
     }
   }
-
 
   float avg_red = red_total / pixels.size();
   float avg_green = green_total / pixels.size();
@@ -67,17 +59,20 @@ ci::ColorA Renderer::CalculateBackgroundColor() {
 }
 
 Shape* Renderer::GenerateRandomShape() const {
-  std::uniform_real_distribution<float> loc_x(0,kWindowSize);
-  std::uniform_real_distribution<float> loc_y(0,kWindowSize);
+  int x_dim = original_image_.GetPixelArray()[0].size();
+  int y_dim = original_image_.GetPixelArray().size();
+
+  std::uniform_real_distribution<float> loc_x(0,x_dim);
+  std::uniform_real_distribution<float> loc_y(0,y_dim);
   std::uniform_real_distribution<float> width(0,kMaxDimension);
   std::uniform_real_distribution<float> height(0,kMaxDimension);
   std::uniform_real_distribution<float> rgb_value(0,1);
-  std::default_random_engine generator;
-  glm::vec2 loc(loc_x(generator), loc_y(generator));
+  static std::default_random_engine generator;
+  glm::vec2 loc((int)loc_x(generator), (int)loc_y(generator));
   ci::ColorA color(rgb_value(generator), rgb_value(generator), rgb_value(generator), kAlpha);
 
   //Rectangle rect(loc, length(generator), width(generator), color);
-  return new Rectangle(loc, width(generator), height(generator), color);
+  return new Rectangle(loc, (int)width(generator), (int)height(generator), color);
 }
 
 void Renderer::draw() {
@@ -89,22 +84,21 @@ void Renderer::draw() {
   }
 }
 
-double Renderer::CalculateRootMeanSquare(Shape* added_shape) const {
+double Renderer::CalculateRootMeanSquare(Shape* added_shape) {
   vector<vector<Pixel>> orig_pixels = original_image_.GetPixelArray();
   vector<vector<Pixel>> new_pixels = generated_image_.GetPixelArray();
-//  double total_red_error = 0;
-//  double total_green_error = 0;
-//  double total_blue_error = 0;
   double total_error = 0;
+  glm::vec2 loc = added_shape->GetLocation();
+  size_t rect_count = 0;
   for (size_t row = 0; row < orig_pixels.size(); row++) {
     for (size_t col = 0; col < orig_pixels[0].size(); col++) {
       //rectangle
-      glm::vec2 loc = added_shape->GetLocation();
-      if (row >= loc.y && row <= loc.y + added_shape->GetWidth() &&
-          col >= loc.x && col <= loc.x + added_shape->GetHeight()) {
-        new_pixels[row][col].SetRed(added_shape->GetColor().r);
-        new_pixels[row][col].SetGreen(added_shape->GetColor().g);
-        new_pixels[row][col].SetBlue(added_shape->GetColor().b);
+      if (row >= loc.y && row <= loc.y + added_shape->GetHeight()  &&
+          col >= loc.x && col <= loc.x + added_shape->GetWidth()) {
+        new_pixels[row][col].SetRGBA(added_shape->GetColor().r,
+                                     added_shape->GetColor().g,
+                                     added_shape->GetColor().b,1);
+        rect_count++;                                                          //TEST
       }
 
       total_error += std::pow(std::abs(new_pixels[row][col].GetRed() - orig_pixels[row][col].GetRed()),2);
@@ -112,6 +106,7 @@ double Renderer::CalculateRootMeanSquare(Shape* added_shape) const {
       total_error += std::pow(std::abs(new_pixels[row][col].GetBlue() - orig_pixels[row][col].GetBlue()),2);
     }
   }
+  generated_image_.SetPixelArray(new_pixels);
 
   double rms = std::pow(total_error / orig_pixels.size(), .5);
   return rms;
@@ -119,15 +114,10 @@ double Renderer::CalculateRootMeanSquare(Shape* added_shape) const {
 
 void Renderer::SetOriginalImage(Image &original) {
   original_image_ = original;
-  std::vector<std::vector<Pixel>> blank_pixels;
-  for (size_t i = 0; i < original.GetPixelArray().size(); i++) {
-    std::vector<Pixel> row;
-    for (size_t j = 0; j < original.GetPixelArray()[0].size(); j++) {
-      Pixel pixel(0,0,0,0);
-      row.push_back(pixel);
-    }
-    blank_pixels.push_back(row);
-  }
+  background_color_ = CalculateBackgroundColor();
+  std::vector<std::vector<Pixel>> blank_pixels(original.GetPixelArray().size(),
+                                               std::vector<Pixel>(original.GetPixelArray()[0].size(),
+                                                                  Pixel(0,0,0,0)));
   generated_image_.SetPixelArray(blank_pixels);
 }
 

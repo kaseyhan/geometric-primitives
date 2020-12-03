@@ -33,7 +33,7 @@ public:
 private:
   ci::ColorA CalculateBackgroundColor();
   Shape* GenerateRandomShape() const;
-  double CalculateRootMeanSquare(Shape* added_shape) const;
+  double CalculateRootMeanSquare(Shape* added_shape);
 
   Image original_image_;
   Image generated_image_;
