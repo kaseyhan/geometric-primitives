@@ -10,9 +10,9 @@ namespace geometricprimitives {
 namespace visualizer {
 
 GeometricPrimitivesApp::GeometricPrimitivesApp() {
+  UploadImage(kFilePath);
   ci::app::setWindowSize((int) kWindowSize, (int) kWindowSize);
   counter_ = 0;
-  UploadImage(kFilePath);
 }
 
 void GeometricPrimitivesApp::update() {

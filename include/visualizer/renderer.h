@@ -24,7 +24,6 @@ public:
   void SetOriginalImage(Image& original);
   void Clear();
 
-  const float kWindowSize = 600;
   const float kMaxDimension = 200;
   const double kMinError = 4;              // CHANGE
   const size_t kMaxRandomShapeTries = 300;   // CHANGE

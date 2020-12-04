@@ -42,6 +42,7 @@ void Renderer::AddShape() {
     double new_rms = CalculateRootMeanSquare(random_shape);
     if (new_rms < rms) {
       rms = new_rms;
+      //delete &shape;            // ????
       shape = random_shape;
     }
     counter++;
@@ -64,9 +65,9 @@ ci::ColorA Renderer::CalculateBackgroundColor() {
     }
   }
 
-  float avg_red = red_total / pixels.size() / 255;
-  float avg_green = green_total / pixels.size() / 255;
-  float avg_blue = blue_total / pixels.size() / 255;
+  float avg_red = red_total / (pixels.size() * pixels[0].size());
+  float avg_green = green_total / (pixels.size() * pixels[0].size());
+  float avg_blue = blue_total / (pixels.size() * pixels[0].size());
   ci::ColorA background_color(avg_red, avg_green, avg_blue, 1);
   return background_color;
 }
