@@ -81,7 +81,6 @@ Shape* Renderer::GenerateRandomShape() const {
   glm::vec2 loc((int)loc_x(generator), (int)loc_y(generator));
   ci::ColorA color(rgb_value(generator), rgb_value(generator), rgb_value(generator), kAlpha);
 
-  //Rectangle rect(loc, length(generator), width(generator), color);
   return new Rectangle(loc, (int)width(generator), (int)height(generator), color);
 }
 
