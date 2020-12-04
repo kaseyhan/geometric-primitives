@@ -15,7 +15,7 @@ GeometricPrimitivesApp::GeometricPrimitivesApp() {
 }
 
 void GeometricPrimitivesApp::update() {
-  renderer_.AddShape();
+  //renderer_.AddShape();
 }
 
 void GeometricPrimitivesApp::draw() {

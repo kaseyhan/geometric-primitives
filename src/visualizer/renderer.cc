@@ -22,6 +22,16 @@ Renderer::Renderer(Image& original) : original_image_(original){
   generated_image_.SetPixelArray(blank_pixels);
 }
 
+void Renderer::draw() {
+  ci::gl::color(background_color_);
+  ci::Rectf background(top_left_corner_, top_left_corner_ + glm::vec2(kWindowSize, kWindowSize));
+  ci::gl::drawSolidRect(background);
+
+  for (size_t i = 0; i < shapes_.size(); i++) {
+    shapes_[i]->Draw();
+  }
+}
+
 void Renderer::AddShape() {
   double rms = std::numeric_limits<double>::max();
   Shape* shape;
@@ -51,9 +61,9 @@ ci::ColorA Renderer::CalculateBackgroundColor() {
     }
   }
 
-  float avg_red = red_total / pixels.size();
-  float avg_green = green_total / pixels.size();
-  float avg_blue = blue_total / pixels.size();
+  float avg_red = red_total / pixels.size() / 255;
+  float avg_green = green_total / pixels.size() / 255;
+  float avg_blue = blue_total / pixels.size() / 255;
   ci::ColorA background_color(avg_red, avg_green, avg_blue, 1);
   return background_color;
 }
@@ -73,15 +83,6 @@ Shape* Renderer::GenerateRandomShape() const {
 
   //Rectangle rect(loc, length(generator), width(generator), color);
   return new Rectangle(loc, (int)width(generator), (int)height(generator), color);
-}
-
-void Renderer::draw() {
-  ci::gl::color(background_color_);
-  ci::Rectf background(top_left_corner_, top_left_corner_ + glm::vec2(kWindowSize, kWindowSize));
-  ci::gl::drawSolidRect(background);
-  for (size_t i = 0; i < shapes_.size(); i++) {
-    shapes_[i]->Draw();
-  }
 }
 
 double Renderer::CalculateRootMeanSquare(Shape* added_shape) {
