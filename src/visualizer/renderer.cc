@@ -106,17 +106,13 @@ double Renderer::CalculateRootMeanSquare(Shape* added_shape) {
   vector<vector<Pixel>> new_pixels = generated_image_.GetPixelArray();
   double total_error = 0;
   glm::vec2 loc = added_shape->GetLocation();
-  size_t rect_count = 0;
-  for (size_t row = 0; row < orig_pixels.size(); row++) {
-    for (size_t col = 0; col < orig_pixels[0].size(); col++) {
+  for (size_t row = loc.y; row < orig_pixels.size(); row++) {
+    for (size_t col = loc.x; col < orig_pixels[0].size(); col++) {
       //rectangle
-      if (row >= loc.y && row <= loc.y + added_shape->GetHeight()  &&
-          col >= loc.x && col <= loc.x + added_shape->GetWidth()) {
         new_pixels[row][col].SetRGBA(added_shape->GetColor().r,
                                      added_shape->GetColor().g,
                                      added_shape->GetColor().b,1);
-        rect_count++;                                                          //TEST
-      }
+
 
       total_error += std::pow(std::abs(new_pixels[row][col].GetRed() - orig_pixels[row][col].GetRed()),2);
       total_error += std::pow(std::abs(new_pixels[row][col].GetGreen() - orig_pixels[row][col].GetGreen()),2);
@@ -125,7 +121,7 @@ double Renderer::CalculateRootMeanSquare(Shape* added_shape) {
   }
   generated_image_.SetPixelArray(new_pixels);
 
-  double rms = std::pow(total_error / orig_pixels.size(), .5);
+  double rms = std::pow(total_error / ((loc.y + added_shape->GetHeight()) *(loc.x + added_shape->GetWidth())), .5);
   return rms;
 }
 
