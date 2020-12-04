@@ -19,10 +19,10 @@ void GeometricPrimitivesApp::update() {
   if (counter_ < kNumShapes) {
     renderer_.AddShape();
     counter_++;
-  } else {    // TEST
-    ci::gl::color(1,0,0);
-    ci::Rectf rectangle(glm::vec2(500,500), glm::vec2(550,550));
-    ci::gl::drawSolidRect(rectangle);
+  } else {        // TEST
+    glm::vec2 string_pos(300,300);
+    std::string str = "DONE";
+    ci::gl::drawStringCentered(str, string_pos, ci::ColorA(1,0,0,1));
   }
 
 }

@@ -44,7 +44,7 @@ void Renderer::AddShape() {
       rms = new_rms;
       shape = random_shape;
     }
-    counter ++;
+    counter++;
   } while (rms > kMinError && counter < kMaxRandomShapeTries);
   shapes_.push_back(shape);
 }
@@ -87,14 +87,13 @@ Shape* Renderer::GenerateRandomShape() const {
     max_width /= 2;
     max_height /= 2;
   }
-
   std::uniform_real_distribution<float> loc_x(0, max_x);
   std::uniform_real_distribution<float> loc_y(0, max_y);
   std::uniform_real_distribution<float> width(0, max_width);
   std::uniform_real_distribution<float> height(0, max_height);
   std::uniform_real_distribution<float> rgb_value(0,1);
-
   static std::default_random_engine generator;
+
   glm::vec2 loc((int)loc_x(generator), (int)loc_y(generator));
   ci::ColorA color(rgb_value(generator), rgb_value(generator), rgb_value(generator), kAlpha);
 
@@ -106,22 +105,23 @@ double Renderer::CalculateRootMeanSquare(Shape* added_shape) {
   vector<vector<Pixel>> new_pixels = generated_image_.GetPixelArray();
   double total_error = 0;
   glm::vec2 loc = added_shape->GetLocation();
-  for (size_t row = loc.y; row < orig_pixels.size(); row++) {
-    for (size_t col = loc.x; col < orig_pixels[0].size(); col++) {
+
+  for (size_t row = 0; row < orig_pixels.size(); row++) {
+    for (size_t col = 0; col < orig_pixels[0].size(); col++) {
       //rectangle
+      if (row >= loc.y && row <= loc.y + added_shape->GetHeight()  &&
+          col >= loc.x && col <= loc.x + added_shape->GetWidth()) {
         new_pixels[row][col].SetRGBA(added_shape->GetColor().r,
                                      added_shape->GetColor().g,
                                      added_shape->GetColor().b,1);
-
-
+      }
       total_error += std::pow(std::abs(new_pixels[row][col].GetRed() - orig_pixels[row][col].GetRed()),2);
       total_error += std::pow(std::abs(new_pixels[row][col].GetGreen() - orig_pixels[row][col].GetGreen()),2);
       total_error += std::pow(std::abs(new_pixels[row][col].GetBlue() - orig_pixels[row][col].GetBlue()),2);
     }
   }
   generated_image_.SetPixelArray(new_pixels);
-
-  double rms = std::pow(total_error / ((loc.y + added_shape->GetHeight()) *(loc.x + added_shape->GetWidth())), .5);
+  double rms = std::pow(total_error / orig_pixels.size(), .5);
   return rms;
 }
 

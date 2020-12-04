@@ -16,7 +16,6 @@ public:
   Renderer(Image& original);
 
   void draw();
-  //void Render();
 
   /*
    * Generates random shapes until it creates one that has minimal error
@@ -27,7 +26,7 @@ public:
 
   const float kWindowSize = 600;
   const float kMaxDimension = 200;
-  const double kMinError = 0.005;              // CHANGE
+  const double kMinError = 4;              // CHANGE
   const size_t kMaxRandomShapeTries = 300;   // CHANGE
   const float kAlpha = 0.5;                 // CHANGE?
   const size_t kNumShapes = 200;
@@ -41,7 +40,7 @@ private:
   Image generated_image_;
   std::vector<Shape*> shapes_;
   ci::ColorA background_color_;
-  glm::vec2 top_left_corner_ = glm::vec2(0,0);
+  glm::vec2 top_left_corner_ = glm::vec2(100,100);
 };
 }
 }
