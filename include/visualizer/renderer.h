@@ -27,8 +27,10 @@ public:
 
   const float kWindowSize = 600;
   const float kMaxDimension = 200;
-  const double kMinError = 10;          // CHANGE
-  const float kAlpha = 0.5;             // CHANGE?
+  const double kMinError = 4;              // CHANGE
+  const size_t kMaxRandomShapeTries = 300;   // CHANGE
+  const float kAlpha = 0.5;                 // CHANGE?
+  const size_t kNumShapes = 200;
 
 private:
   ci::ColorA CalculateBackgroundColor();

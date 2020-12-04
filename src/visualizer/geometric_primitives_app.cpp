@@ -11,11 +11,20 @@ namespace visualizer {
 
 GeometricPrimitivesApp::GeometricPrimitivesApp() {
   ci::app::setWindowSize((int) kWindowSize, (int) kWindowSize);
+  counter_ = 0;
   UploadImage(kFilePath);
 }
 
 void GeometricPrimitivesApp::update() {
-  //renderer_.AddShape();
+  if (counter_ < kNumShapes) {
+    renderer_.AddShape();
+    counter_++;
+  } else {    // TEST
+    ci::gl::color(1,0,0);
+    ci::Rectf rectangle(glm::vec2(500,500), glm::vec2(550,550));
+    ci::gl::drawSolidRect(rectangle);
+  }
+
 }
 
 void GeometricPrimitivesApp::draw() {

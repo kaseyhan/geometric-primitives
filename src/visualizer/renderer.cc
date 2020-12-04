@@ -24,7 +24,8 @@ Renderer::Renderer(Image& original) : original_image_(original){
 
 void Renderer::draw() {
   ci::gl::color(background_color_);
-  ci::Rectf background(top_left_corner_, top_left_corner_ + glm::vec2(kWindowSize, kWindowSize));
+  ci::Rectf background(top_left_corner_, top_left_corner_ + glm::vec2(original_image_.GetPixelArray()[0].size(),
+                                                                      original_image_.GetPixelArray().size()));
   ci::gl::drawSolidRect(background);
 
   for (size_t i = 0; i < shapes_.size(); i++) {
@@ -35,6 +36,7 @@ void Renderer::draw() {
 void Renderer::AddShape() {
   double rms = std::numeric_limits<double>::max();
   Shape* shape;
+  size_t counter = 0;
   do {
     Shape* random_shape = GenerateRandomShape();
     double new_rms = CalculateRootMeanSquare(random_shape);
@@ -42,7 +44,8 @@ void Renderer::AddShape() {
       rms = new_rms;
       shape = random_shape;
     }
-  } while (rms > kMinError);
+    counter ++;
+  } while (rms > kMinError && counter < kMaxRandomShapeTries);
   shapes_.push_back(shape);
 }
 
@@ -69,14 +72,28 @@ ci::ColorA Renderer::CalculateBackgroundColor() {
 }
 
 Shape* Renderer::GenerateRandomShape() const {
-  int x_dim = original_image_.GetPixelArray()[0].size();
-  int y_dim = original_image_.GetPixelArray().size();
+  int max_x = original_image_.GetPixelArray()[0].size();
+  int max_y = original_image_.GetPixelArray().size();
+  int max_width = kMaxDimension;
+  int max_height = kMaxDimension;
 
-  std::uniform_real_distribution<float> loc_x(0,x_dim);
-  std::uniform_real_distribution<float> loc_y(0,y_dim);
-  std::uniform_real_distribution<float> width(0,kMaxDimension);
-  std::uniform_real_distribution<float> height(0,kMaxDimension);
+  if (shapes_.size() > kNumShapes / 2) {
+    max_width /= 20;
+    max_height /= 20;
+  } else if (shapes_.size() > kNumShapes / 10) {
+    max_width /= 10;
+    max_height /= 10;
+  } else if (shapes_.size() > kNumShapes / 20) {
+    max_width /= 2;
+    max_height /= 2;
+  }
+
+  std::uniform_real_distribution<float> loc_x(0, max_x);
+  std::uniform_real_distribution<float> loc_y(0, max_y);
+  std::uniform_real_distribution<float> width(0, max_width);
+  std::uniform_real_distribution<float> height(0, max_height);
   std::uniform_real_distribution<float> rgb_value(0,1);
+
   static std::default_random_engine generator;
   glm::vec2 loc((int)loc_x(generator), (int)loc_y(generator));
   ci::ColorA color(rgb_value(generator), rgb_value(generator), rgb_value(generator), kAlpha);
