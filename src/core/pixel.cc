@@ -22,4 +22,16 @@ void Pixel::SetRGBA(float r, float g, float b, float a) {
   alpha_ = a;
 }
 
+void Pixel::AddRGBA(float added_red, float added_green, float added_blue, float added_alpha) {
+  float new_alpha = 1 - (1 - added_alpha) * (1 - alpha_);
+
+  if (new_alpha > 1.0e-6) {
+    red_ = added_red * added_alpha / new_alpha + red_ * alpha_ * (1 - added_alpha) / new_alpha;
+    green_ = added_green * added_alpha / new_alpha + green_ * alpha_ * (1 - added_alpha) / new_alpha;
+    blue_ = added_blue * added_alpha / new_alpha + blue_ * alpha_ * (1 - added_alpha) / new_alpha;
+  }
+
+  alpha_ = new_alpha;
+}
+
 }

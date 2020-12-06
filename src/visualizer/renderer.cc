@@ -23,6 +23,7 @@ Renderer::Renderer(Image& original) : original_image_(original){
 }
 
 void Renderer::draw() {
+  ci::gl::clear();
   ci::gl::color(background_color_);
   ci::Rectf background(top_left_corner_, top_left_corner_ + glm::vec2(original_image_.GetPixelArray()[0].size(),
                                                                       original_image_.GetPixelArray().size()));
@@ -35,14 +36,15 @@ void Renderer::draw() {
 
 void Renderer::AddShape() {
   double rms = std::numeric_limits<double>::max();
-  Shape* shape;
+  Shape* shape = nullptr;
   size_t counter = 0;
   do {
     Shape* random_shape = GenerateRandomShape();
     double new_rms = CalculateRootMeanSquare(random_shape);
+//    double new_rms = CalculatePartialRootMeanSquare(random_shape);
     if (new_rms < rms) {
       rms = new_rms;
-      //delete &shape;            // ????
+      delete shape;
       shape = random_shape;
     }
     counter++;
@@ -88,10 +90,10 @@ Shape* Renderer::GenerateRandomShape() const {
     max_width /= 2;
     max_height /= 2;
   }
-  std::uniform_real_distribution<float> loc_x(0, max_x);
-  std::uniform_real_distribution<float> loc_y(0, max_y);
-  std::uniform_real_distribution<float> width(0, max_width);
-  std::uniform_real_distribution<float> height(0, max_height);
+  std::uniform_real_distribution<float> loc_x(top_left_corner_.x - kMaxDimension/4, top_left_corner_.x + max_x);
+  std::uniform_real_distribution<float> loc_y(top_left_corner_.y - kMaxDimension/4, top_left_corner_.y + max_y);
+  std::uniform_real_distribution<float> width(1, max_width);
+  std::uniform_real_distribution<float> height(1, max_height);
   std::uniform_real_distribution<float> rgb_value(0,1);
   static std::default_random_engine generator;
 
@@ -112,9 +114,9 @@ double Renderer::CalculateRootMeanSquare(Shape* added_shape) {
       //rectangle
       if (row >= loc.y && row <= loc.y + added_shape->GetHeight()  &&
           col >= loc.x && col <= loc.x + added_shape->GetWidth()) {
-        new_pixels[row][col].SetRGBA(added_shape->GetColor().r,
+        new_pixels[row][col].AddRGBA(added_shape->GetColor().r,
                                      added_shape->GetColor().g,
-                                     added_shape->GetColor().b,1);
+                                     added_shape->GetColor().b,kAlpha);
       }
       total_error += std::pow(std::abs(new_pixels[row][col].GetRed() - orig_pixels[row][col].GetRed()),2);
       total_error += std::pow(std::abs(new_pixels[row][col].GetGreen() - orig_pixels[row][col].GetGreen()),2);
@@ -122,6 +124,32 @@ double Renderer::CalculateRootMeanSquare(Shape* added_shape) {
     }
   }
   generated_image_.SetPixelArray(new_pixels);
+  double rms = std::pow(total_error / orig_pixels.size(), .5);
+  return rms;
+}
+
+double Renderer::CalculatePartialRootMeanSquare(Shape* added_shape) {
+  vector<vector<Pixel>> orig_pixels = original_image_.GetPixelArray();
+  vector<vector<Pixel>> new_pixels = generated_image_.GetPixelArray();
+  double total_error = 0;
+  glm::vec2 loc = added_shape->GetLocation();
+  int row_bound = std::min(added_shape->GetHeight(), (int)orig_pixels.size());
+  int col_bound = std::min(added_shape->GetWidth(), (int)orig_pixels[0].size());
+
+
+  for (size_t row = loc.y; row < row_bound; row++) {
+    for (size_t col = loc.x; col < col_bound; col++) {
+      //rectangle
+      new_pixels[row][col].AddRGBA(added_shape->GetColor().r,
+                                     added_shape->GetColor().g,
+                                     added_shape->GetColor().b,kAlpha);
+
+      total_error += std::pow(std::abs(new_pixels[row][col].GetRed() - orig_pixels[row][col].GetRed()),2);
+      total_error += std::pow(std::abs(new_pixels[row][col].GetGreen() - orig_pixels[row][col].GetGreen()),2);
+      total_error += std::pow(std::abs(new_pixels[row][col].GetBlue() - orig_pixels[row][col].GetBlue()),2);
+    }
+  }
+  generated_image_.SetPartialPixelArray(new_pixels, loc.y, row_bound, loc.x, col_bound);
   double rms = std::pow(total_error / orig_pixels.size(), .5);
   return rms;
 }

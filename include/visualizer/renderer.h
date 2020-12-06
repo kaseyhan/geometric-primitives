@@ -25,8 +25,8 @@ public:
   void Clear();
 
   const float kMaxDimension = 200;
-  const double kMinError = 4;              // CHANGE
-  const size_t kMaxRandomShapeTries = 300;   // CHANGE
+  const double kMinError = 1;              // CHANGE
+  const size_t kMaxRandomShapeTries = 500;   // CHANGE
   const float kAlpha = 0.5;                 // CHANGE?
   const size_t kNumShapes = 200;
 
@@ -34,6 +34,7 @@ private:
   ci::ColorA CalculateBackgroundColor();
   Shape* GenerateRandomShape() const;
   double CalculateRootMeanSquare(Shape* added_shape);
+  double CalculatePartialRootMeanSquare(Shape* added_shape);
 
   Image original_image_;
   Image generated_image_;

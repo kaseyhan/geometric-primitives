@@ -23,6 +23,8 @@ public:
   void SetRGBA(float r, float g, float b, float a);
   void SetLocation(glm::vec2 new_loc);
 
+  void AddRGBA(float added_red, float added_green, float added_blue, float added_alpha);
+
 private:
   float red_;
   float green_;
