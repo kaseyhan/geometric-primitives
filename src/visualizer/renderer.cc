@@ -90,6 +90,7 @@ Shape* Renderer::GenerateRandomShape() const {
     max_width /= 2;
     max_height /= 2;
   }
+
   std::uniform_real_distribution<float> loc_x(top_left_corner_.x - kMaxDimension/4, top_left_corner_.x + max_x);
   std::uniform_real_distribution<float> loc_y(top_left_corner_.y - kMaxDimension/4, top_left_corner_.y + max_y);
   std::uniform_real_distribution<float> width(1, max_width);
@@ -99,6 +100,21 @@ Shape* Renderer::GenerateRandomShape() const {
 
   glm::vec2 loc((int)loc_x(generator), (int)loc_y(generator));
   ci::ColorA color(rgb_value(generator), rgb_value(generator), rgb_value(generator), kAlpha);
+  int w = 0;
+  int h = 0;
+
+  bool not_in_range_x = true;
+  bool not_in_range_y = true;
+  do {
+    w = (int)width(generator);
+    h = (int)height(generator);
+
+    not_in_range_x = ((loc.x + w) <= top_left_corner_.x);
+    not_in_range_y = ((loc.y + h) <= top_left_corner_.y);
+
+    std::cout << "HI";
+
+  } while (not_in_range_x || not_in_range_y);   // while the shape is not on the canvas
 
   return new Rectangle(loc, (int)width(generator), (int)height(generator), color);
 }
