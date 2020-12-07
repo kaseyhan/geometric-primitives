@@ -26,7 +26,7 @@ public:
 
   const float kMaxDimension = 200;
   const double kMinError = 1;              // CHANGE
-  const size_t kMaxRandomShapeTries = 300;   // CHANGE
+  const size_t kMaxRandomShapeTries = 500;   // CHANGE
   const float kAlpha = 0.5;                 // CHANGE?
   const size_t kNumShapes = 200;
 

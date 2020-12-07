@@ -100,7 +100,7 @@ Shape* Renderer::GenerateRandomShape() const {
 
   glm::vec2 loc((int)loc_x(generator), (int)loc_y(generator));
   ci::ColorA color(rgb_value(generator), rgb_value(generator), rgb_value(generator), kAlpha);
-  
+
   int w = 0;
   int h = 0;
   do {
@@ -117,12 +117,26 @@ double Renderer::CalculateRootMeanSquare(Shape* added_shape) {
   vector<vector<Pixel>> new_pixels = generated_image_.GetPixelArray();
   double total_error = 0;
   glm::vec2 loc = added_shape->GetLocation();
+  size_t row_start = 0;
+  size_t col_start = 0;
+  size_t row_end = std::min(orig_pixels.size(), ((unsigned int)loc.y + added_shape->GetHeight()));
+  size_t col_end = std::min(orig_pixels[0].size(), ((unsigned int)loc.x + added_shape->GetWidth()));
+
+  if (loc.y <= top_left_corner_.y) row_start = 0;   // if the shape is further left than the image
+  else row_start = loc.y - top_left_corner_.y;      // if the shape's x starts on the image
+
+  if (loc.x <= top_left_corner_.x) col_start = 0;
+  else col_start = loc.x - top_left_corner_.x;
+
+//  if (loc.y + added_shape->GetHeight() >= orig_pixels.size()) row_end = orig_pixels.size();  // if the shape ends off of the image
+//  else row_end = loc.y + added_shape->GetHeight();                                           // if the shape ends on the image
+
+//  if (loc.x + added_shape->GetWidth() >= orig_pixels[0].size()) col_end = orig_pixels[0].size();
 
   for (size_t row = 0; row < orig_pixels.size(); row++) {
     for (size_t col = 0; col < orig_pixels[0].size(); col++) {
       //rectangle
-      if (row >= loc.y && row <= loc.y + added_shape->GetHeight()  &&
-          col >= loc.x && col <= loc.x + added_shape->GetWidth()) {
+      if (row >= row_start && row <= row_end    &&    col >= col_start && col <= col_end) {
         new_pixels[row][col].AddRGBA(added_shape->GetColor().r,
                                      added_shape->GetColor().g,
                                      added_shape->GetColor().b,kAlpha);
