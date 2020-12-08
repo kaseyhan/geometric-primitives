@@ -24,10 +24,15 @@ void Rectangle::Mutate(int max_dim) {
 
 glm::vec2 Rectangle::GetLocation() const { return top_left_corner_; }
 void Rectangle::SetLocation(glm::vec2 &new_corner) { top_left_corner_ = new_corner; }
-int Rectangle::GetHeight() { return height_; }
-int Rectangle::GetWidth() { return width_; }
-ci::ColorA Rectangle::GetColor() { return color_; }
 
+int Rectangle::GetHeight() { return height_; }
+void Rectangle::SetHeight(int new_height) { height_ = new_height; }
+
+int Rectangle::GetWidth() { return width_; }
+void Rectangle::SetWidth(int new_width) { width_ = new_width; }
+
+ci::ColorA Rectangle::GetColor() { return color_; }
+void Rectangle::SetColor(ci::ColorA &new_color) { color_ = new_color; }
 
 }
 }

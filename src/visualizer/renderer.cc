@@ -35,6 +35,15 @@ void Renderer::draw() {
 }
 
 void Renderer::AddShape() {
+  Shape* shape = GenerateInitialShape();
+  AdjustShapeColor(shape);
+  AdjustShapeSize(shape);
+  
+  shapes_.push_back(shape);
+  AddShapeToGeneratedImage(shape);
+}
+
+Shape* Renderer::GenerateInitialShape() {
   double rms = std::numeric_limits<double>::max();
   Shape* shape = nullptr;
   size_t counter = 0;
@@ -48,19 +57,48 @@ void Renderer::AddShape() {
       shape = random_shape;
     }
     counter++;
-  } while (rms * .7 > kMinError && counter < kMaxRandomShapeTries);
+  } while (rms > kMinError * 3 && counter < kMaxRandomShapeTries);
 
-  counter = 0;
+  return shape;
+}
+
+void Renderer::AdjustShapeColor(Shape *shape) {
+  double rms = std::numeric_limits<double>::max();
+  size_t counter = 0;
+  std::uniform_real_distribution<float> rgb_value(0,1);
+  static std::default_random_engine generator;
+
   do {
+    ci::ColorA old_color = shape->GetColor();
+    ci::ColorA new_color(rgb_value(generator), rgb_value(generator), rgb_value(generator), kAlpha);
+    shape->SetColor(new_color);
+    double new_rms = CalculateRootMeanSquare(shape);
+
+    if (new_rms < rms) rms = new_rms;
+    else shape->SetColor(old_color);
+
+    counter++;
+  } while (rms > kMinError * 2 && counter < kMaxColorChanges);
+}
+
+void Renderer::AdjustShapeSize(Shape *shape) {
+  double rms = std::numeric_limits<double>::max();
+  size_t counter = 0;
+
+  do {
+    int old_height = shape->GetHeight();
+    int old_width = shape->GetWidth();
     shape->Mutate(kMaxDimension);
     double new_rms = CalculateRootMeanSquare(shape);
+
     if (new_rms < rms) {
       rms = new_rms;
+    } else {
+      shape->SetHeight(old_height);
+      shape->SetWidth(old_width);
     }
     counter++;
   } while (rms > kMinError && counter < kMaxMutations);
-  shapes_.push_back(shape);
-  AddShapeToGeneratedImage(shape);
 }
 
 ci::ColorA Renderer::CalculateBackgroundColor() {
@@ -123,7 +161,6 @@ Shape* Renderer::GenerateRandomShape() const {
     glm::vec2 wh(w,h);
     shape = ci::Rectf(loc, loc + wh);
   } while(!canvas.intersects(shape));
-  //while ((loc.x + w) <= top_left_corner_.x || (loc.y + h) <= top_left_corner_.y);   // while the shape is not on the canvas
 
   return new Rectangle(loc, w, h, color);
 }

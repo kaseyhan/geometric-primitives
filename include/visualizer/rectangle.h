@@ -18,6 +18,9 @@ public:
   int GetHeight() override;
   int GetWidth() override;
   ci::ColorA GetColor() override;
+  void SetColor(ci::ColorA& new_color) override;
+  void SetHeight(int new_height);
+  void SetWidth(int new_width);
 
 private:
   glm::vec2 top_left_corner_;

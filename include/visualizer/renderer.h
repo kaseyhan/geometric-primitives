@@ -24,9 +24,10 @@ public:
   void SetOriginalImage(Image& original);
   void Clear();
 
-  const float kMaxDimension = 200;
-  const double kMinError = 1;              // CHANGE
-  const size_t kMaxRandomShapeTries = 300;   // CHANGE
+  const int kMaxDimension = 200;
+  const double kMinError = 0.5;              // CHANGE
+  const size_t kMaxRandomShapeTries = 150;   // CHANGE
+  const size_t kMaxColorChanges = 50;       // CHANGE
   const size_t kMaxMutations = 50;           // CHANGE
   const float kAlpha = 0.5;                 // CHANGE?
   const size_t kNumShapes = 200;
@@ -37,6 +38,9 @@ private:
   double CalculateRootMeanSquare(Shape* added_shape);
   double CalculatePartialRootMeanSquare(Shape* added_shape);
   void AddShapeToGeneratedImage(Shape* shape);
+  Shape* GenerateInitialShape();
+  void AdjustShapeSize(Shape* shape);
+  void AdjustShapeColor(Shape* shape);
 
   Image original_image_;
   Image generated_image_;
