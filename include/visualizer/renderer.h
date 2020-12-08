@@ -24,13 +24,15 @@ public:
   void SetOriginalImage(Image& original);
   void Clear();
 
-  const int kMaxDimension = 200;
+  const size_t kNumShapes = 100;
+  const float kAlpha = 0.5;
+
+  // adjust for accuracy/speed
+  const float kSkipProportion = 0.00015;
   const double kMinError = 0.5;              // CHANGE
-  const size_t kMaxRandomShapeTries = 150;   // CHANGE
+  const size_t kMaxRandomShapeTries = 200;   // CHANGE
   const size_t kMaxColorChanges = 50;       // CHANGE
   const size_t kMaxMutations = 50;           // CHANGE
-  const float kAlpha = 0.5;                 // CHANGE?
-  const size_t kNumShapes = 200;
 
 private:
   ci::ColorA CalculateBackgroundColor();
@@ -42,6 +44,7 @@ private:
 
   double CalculateRootMeanSquare(Shape* added_shape);
   double CalculatePartialRootMeanSquare(Shape* added_shape);
+  double CalculateRootMeanSquareFaster(Shape* added_shape);
 
   void AddShapeToGeneratedImage(Shape* shape);
   Shape* GenerateInitialShape();
@@ -52,7 +55,9 @@ private:
   Image generated_image_;
   std::vector<Shape*> shapes_;
   ci::ColorA background_color_;
-  glm::vec2 top_left_corner_ = glm::vec2(100,100);
+  glm::vec2 top_left_corner_ = glm::vec2(50,50);
+  int skip_;
+  int max_dim_;
 };
 }
 }

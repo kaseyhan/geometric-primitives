@@ -23,7 +23,7 @@ public:
   std::vector<std::vector<Pixel>> DecodeImage(const std::string& file_path);
 
   const float kWindowSize = 400;
-  const std::string kFilePath = "C:\\Users\\kjhan\\Desktop\\cinder_0.9.2_vc2015\\my-projects\\final-project-kaseyhan\\test.png";
+  const std::string kFilePath = "C:\\Users\\kjhan\\Desktop\\cinder_0.9.2_vc2015\\my-projects\\final-project-kaseyhan\\default_image.png";
   const size_t kNumShapes = 100;
 
 private:
