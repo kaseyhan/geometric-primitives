@@ -34,9 +34,15 @@ public:
 
 private:
   ci::ColorA CalculateBackgroundColor();
-  Shape* GenerateRandomShape() const;
+
+  Shape* GenerateRandomShape();
+  ci::ColorA GenerateRandomColor();
+  glm::vec2 GenerateRandomLocation(int max_x, int max_y);
+  vector<int> GenerateRandomShapeDimensions(ci::Rectf& canvas, glm::vec2& loc);
+
   double CalculateRootMeanSquare(Shape* added_shape);
   double CalculatePartialRootMeanSquare(Shape* added_shape);
+
   void AddShapeToGeneratedImage(Shape* shape);
   Shape* GenerateInitialShape();
   void AdjustShapeSize(Shape* shape);

@@ -15,11 +15,12 @@ void Rectangle::Draw() {
   ci::gl::drawSolidRect(rectangle);
 }
 
-void Rectangle::Mutate(int max_dim) {
-  std::uniform_real_distribution<float> new_dim(1,max_dim);
+void Rectangle::Mutate(int max_width, int max_height) {
+  std::uniform_real_distribution<float> h(1,max_height);
+  std::uniform_real_distribution<float> w(1,max_width);
   static std::default_random_engine generator;
-  width_ = new_dim(generator);
-  height_ = new_dim(generator);
+  width_ = w(generator);
+  height_ = h(generator);
 }
 
 glm::vec2 Rectangle::GetLocation() const { return top_left_corner_; }

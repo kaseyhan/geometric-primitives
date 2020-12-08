@@ -38,7 +38,7 @@ void Renderer::AddShape() {
   Shape* shape = GenerateInitialShape();
   AdjustShapeColor(shape);
   AdjustShapeSize(shape);
-  
+
   shapes_.push_back(shape);
   AddShapeToGeneratedImage(shape);
 }
@@ -84,11 +84,24 @@ void Renderer::AdjustShapeColor(Shape *shape) {
 void Renderer::AdjustShapeSize(Shape *shape) {
   double rms = std::numeric_limits<double>::max();
   size_t counter = 0;
+  int max_width = kMaxDimension;
+  int max_height = kMaxDimension;
+
+  if (shapes_.size() > kNumShapes / 2) {
+    max_width /= 20;
+    max_height /= 20;
+  } else if (shapes_.size() > kNumShapes / 10) {
+    max_width /= 10;
+    max_height /= 10;
+  } else if (shapes_.size() > kNumShapes / 20) {
+    max_width /= 2;
+    max_height /= 2;
+  }
 
   do {
     int old_height = shape->GetHeight();
     int old_width = shape->GetWidth();
-    shape->Mutate(kMaxDimension);
+    shape->Mutate(max_width, max_height);
     double new_rms = CalculateRootMeanSquare(shape);
 
     if (new_rms < rms) {
@@ -123,9 +136,40 @@ ci::ColorA Renderer::CalculateBackgroundColor() {
   return background_color;
 }
 
-Shape* Renderer::GenerateRandomShape() const {
+Shape* Renderer::GenerateRandomShape() {
   int max_x = original_image_.GetPixelArray()[0].size();
   int max_y = original_image_.GetPixelArray().size();
+  ci::Rectf canvas(top_left_corner_, top_left_corner_ + glm::vec2(max_x, max_y));
+
+  ci::ColorA color = GenerateRandomColor();
+  glm::vec2 loc = GenerateRandomLocation(max_x, max_y);
+  std::vector<int> dimensions = GenerateRandomShapeDimensions(canvas, loc);
+
+  return new Rectangle(loc, dimensions[0], dimensions[1], color);
+}
+
+ci::ColorA Renderer::GenerateRandomColor() {
+  std::uniform_real_distribution<float> rgb_value(0,1);
+  static std::default_random_engine generator;
+
+  return ci::ColorA(rgb_value(generator), rgb_value(generator), rgb_value(generator), kAlpha);
+}
+
+glm::vec2 Renderer::GenerateRandomLocation(int max_x, int max_y) {
+  std::uniform_real_distribution<float> loc_x(top_left_corner_.x - kMaxDimension/8, top_left_corner_.x + max_x);
+  std::uniform_real_distribution<float> loc_y(top_left_corner_.y - kMaxDimension/8, top_left_corner_.y + max_y);
+  static std::default_random_engine generator;
+  glm::vec2 loc;
+  glm::vec2 bot_right_corner(top_left_corner_ + glm::vec2(max_x, max_y));
+
+  do {
+    loc = glm::vec2((int)loc_x(generator), (int)loc_y(generator));
+  } while (loc.x >= (bot_right_corner.x * .97f) || loc.y >= (bot_right_corner.y * .97f)); // regenerate if shape is really far in the corner
+
+  return loc;
+}
+
+std::vector<int> Renderer::GenerateRandomShapeDimensions(ci::Rectf& canvas, glm::vec2& loc) {
   int max_width = kMaxDimension;
   int max_height = kMaxDimension;
 
@@ -140,17 +184,10 @@ Shape* Renderer::GenerateRandomShape() const {
     max_height /= 2;
   }
 
-  std::uniform_real_distribution<float> loc_x(top_left_corner_.x - kMaxDimension/4, top_left_corner_.x + max_x);
-  std::uniform_real_distribution<float> loc_y(top_left_corner_.y - kMaxDimension/4, top_left_corner_.y + max_y);
   std::uniform_real_distribution<float> width(1, max_width);
   std::uniform_real_distribution<float> height(1, max_height);
-  std::uniform_real_distribution<float> rgb_value(0,1);
   static std::default_random_engine generator;
 
-  glm::vec2 loc((int)loc_x(generator), (int)loc_y(generator));
-  ci::ColorA color(rgb_value(generator), rgb_value(generator), rgb_value(generator), kAlpha);
-
-  ci::Rectf canvas(top_left_corner_, top_left_corner_ + glm::vec2(max_x, max_y));
   ci::Rectf shape;
   int w = 0;
   int h = 0;
@@ -160,9 +197,9 @@ Shape* Renderer::GenerateRandomShape() const {
     h = (int)height(generator);
     glm::vec2 wh(w,h);
     shape = ci::Rectf(loc, loc + wh);
-  } while(!canvas.intersects(shape));
+  } while(!canvas.intersects(shape));   // regenerate if shape doesn't overlap canvas
 
-  return new Rectangle(loc, w, h, color);
+  return std::vector<int> {w,h};
 }
 
 double Renderer::CalculateRootMeanSquare(Shape* added_shape) {
