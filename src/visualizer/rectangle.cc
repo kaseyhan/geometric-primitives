@@ -1,5 +1,6 @@
 #include <visualizer/shape.h>
 #include <visualizer/rectangle.h>
+#include <random>
 
 namespace geometricprimitives {
 namespace visualizer {
@@ -14,7 +15,11 @@ void Rectangle::Draw() {
   ci::gl::drawSolidRect(rectangle);
 }
 
-void Rectangle::Mutate() {
+void Rectangle::Mutate(int max_dim) {
+  std::uniform_real_distribution<float> new_dim(1,max_dim);
+  static std::default_random_engine generator;
+  width_ = new_dim(generator);
+  height_ = new_dim(generator);
 }
 
 glm::vec2 Rectangle::GetLocation() const { return top_left_corner_; }

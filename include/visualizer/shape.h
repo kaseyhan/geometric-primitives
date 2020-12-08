@@ -9,7 +9,7 @@ namespace geometricprimitives {
 class Shape {
 public:
   virtual void Draw() = 0;
-  virtual void Mutate() = 0;
+  virtual void Mutate(int max_dim) = 0;
 
   virtual glm::vec2 GetLocation() const = 0;
   virtual void SetLocation(glm::vec2& new_loc) = 0;

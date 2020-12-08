@@ -26,7 +26,8 @@ public:
 
   const float kMaxDimension = 200;
   const double kMinError = 1;              // CHANGE
-  const size_t kMaxRandomShapeTries = 500;   // CHANGE
+  const size_t kMaxRandomShapeTries = 300;   // CHANGE
+  const size_t kMaxMutations = 50;           // CHANGE
   const float kAlpha = 0.5;                 // CHANGE?
   const size_t kNumShapes = 200;
 
@@ -35,6 +36,7 @@ private:
   Shape* GenerateRandomShape() const;
   double CalculateRootMeanSquare(Shape* added_shape);
   double CalculatePartialRootMeanSquare(Shape* added_shape);
+  void AddShapeToGeneratedImage(Shape* shape);
 
   Image original_image_;
   Image generated_image_;
