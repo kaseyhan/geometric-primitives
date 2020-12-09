@@ -33,10 +33,10 @@ public:
 
   // adjust for accuracy/speed
   const float kSkipProportion = 0.00015;
-  const double kMinError = 1.000;              // CHANGE
-  const size_t kMaxRandomShapeTries = 210;   // CHANGE
-  const size_t kMaxColorChanges = 100;       // CHANGE
-  const size_t kMaxMutations = 50;           // CHANGE
+  const double kMinError = 0.0000010;              // CHANGE
+  const size_t kMaxRandomShapeTries = 100;   // CHANGE
+  const size_t kMaxColorChanges = 200;       // CHANGE
+  const size_t kMaxMutations = 100;           // CHANGE
 
 private:
   ci::ColorA CalculateBackgroundColor();

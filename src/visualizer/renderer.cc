@@ -53,14 +53,14 @@ Shape* Renderer::GenerateInitialShape() {
   size_t counter = 0;
   do {
     Shape* random_shape = GenerateRandomShape();
-    double new_rms = CalculateRootMeanSquareFaster(random_shape);
+    double new_rms = CalculatePartialRootMeanSquare(random_shape);
     if (new_rms < rms) {
       rms = new_rms;
       delete shape;
       shape = random_shape;
     }
     counter++;
-  } while (rms > kMinError * 3 && counter < kMaxRandomShapeTries);
+  } while (rms > kMinError * 2 && counter < kMaxRandomShapeTries);
 
   return shape;
 }
@@ -73,13 +73,13 @@ void Renderer::AdjustShapeColor(Shape *shape) {
     ci::ColorA old_color = shape->GetColor();
     ci::ColorA new_color = GenerateRandomColor();
     shape->SetColor(new_color);
-    double new_rms = CalculateRootMeanSquareFaster(shape);
+    double new_rms = CalculatePartialRootMeanSquare(shape);
 
     if (new_rms < rms) rms = new_rms;
     else shape->SetColor(old_color);
 
     counter++;
-  } while (rms > kMinError * 2 && counter < kMaxColorChanges);
+  } while (rms > kMinError * 1.5 && counter < kMaxColorChanges);
   std::cout<< "HI";                                                             // TEST
 }
 
@@ -99,7 +99,7 @@ void Renderer::AdjustShapeSize(Shape *shape) {
     std::vector<int> rand_dim = GenerateRandomShapeDimensions(loc);
     shape->SetWidth(rand_dim[0]);
     shape->SetHeight(rand_dim[1]);
-    double new_rms = CalculateRootMeanSquareFaster(shape);
+    double new_rms = CalculatePartialRootMeanSquare(shape);
 
     if (new_rms < rms) {
       rms = new_rms;
@@ -172,10 +172,10 @@ std::vector<int> Renderer::GenerateRandomShapeDimensions(glm::vec2& loc) {
     max_height /= 10;
   } else if (shapes_.size() > kNumShapes / 5) {
     max_width /= 7;
-    max_width /= 7;
+    max_height /= 7;
   } else if (shapes_.size() > kNumShapes / 10) {
-      max_width /= 3;
-      max_height /= 3;
+    max_width /= 3;
+    max_height /= 3;
   } else if (shapes_.size() > kNumShapes / 20) {
     max_width /= 1.4;
     max_height /= 1.4;
@@ -189,11 +189,14 @@ std::vector<int> Renderer::GenerateRandomShapeDimensions(glm::vec2& loc) {
   if (loc.y > (top_left_corner_.y + max_dim_) * 0.65) max_height *= 0.3;
 
   if (min_width > max_width) {
-    min_width = max_width * 0.2;
+    max_width += min_width - max_width + 5;
   }
   if (min_height > max_height) {
-    min_height = max_height * 0.2;
+    max_height += min_height - max_height + 5;
   }
+
+  if (loc.x + min_width < top_left_corner_.x) min_width += top_left_corner_.x - (loc.x + min_width) + 5;            // last check
+  if (loc.y + min_height < top_left_corner_.y) min_height += top_left_corner_.y - (loc.y + min_height) + 5;
 
   std::uniform_real_distribution<float> width(min_width, max_width);
   std::uniform_real_distribution<float> height(min_height, max_height);
@@ -246,24 +249,25 @@ double Renderer::CalculatePartialRootMeanSquare(Shape* added_shape) {
   vector<vector<Pixel>> new_pixels = generated_image_.GetPixelArray();
   double total_error = 0;
   glm::vec2 loc = added_shape->GetLocation();
-  int row_bound = std::min(added_shape->GetHeight(), (int)orig_pixels.size());
-  int col_bound = std::min(added_shape->GetWidth(), (int)orig_pixels[0].size());
+  size_t row_start = 0; // if the shape starts further up than the image
+  size_t col_start = 0;
+  if (loc.y > top_left_corner_.y) row_start = loc.y - top_left_corner_.y;      // if the shape's y starts on the image
+  if (loc.x > top_left_corner_.x) col_start = loc.x - top_left_corner_.x;
+  size_t row_end = std::min(orig_pixels.size(), ((unsigned int) loc.y + added_shape->GetHeight()));
+  size_t col_end = std::min(orig_pixels[0].size(), ((unsigned int) loc.x + added_shape->GetWidth()));
 
-
-  for (size_t row = loc.y; row < row_bound; row++) {
-    for (size_t col = loc.x; col < col_bound; col++) {
-      //rectangle
+  for (size_t row = row_start; row < row_end; row++) {
+    for (size_t col = col_start; col < col_end; col++) {
       new_pixels[row][col].AddRGBA(added_shape->GetColor().r,
                                      added_shape->GetColor().g,
                                      added_shape->GetColor().b,kAlpha);
 
-      total_error += std::pow(std::abs(new_pixels[row][col].GetRed() - orig_pixels[row][col].GetRed()),2);
-      total_error += std::pow(std::abs(new_pixels[row][col].GetGreen() - orig_pixels[row][col].GetGreen()),2);
-      total_error += std::pow(std::abs(new_pixels[row][col].GetBlue() - orig_pixels[row][col].GetBlue()),2);
+      total_error += std::pow(new_pixels[row][col].GetRed() - orig_pixels[row][col].GetRed(),2);
+      total_error += std::pow(new_pixels[row][col].GetGreen() - orig_pixels[row][col].GetGreen(),2);
+      total_error += std::pow(new_pixels[row][col].GetBlue() - orig_pixels[row][col].GetBlue(),2);
     }
   }
-  generated_image_.SetPartialPixelArray(new_pixels, loc.y, row_bound, loc.x, col_bound);
-  double rms = std::pow(total_error / orig_pixels.size(), .5);
+  double rms = total_error / std::pow(((row_end - row_start) * (col_end - col_start)),2);
   return rms;
 }
 
@@ -288,22 +292,22 @@ double Renderer::CalculateRootMeanSquareFaster(Shape* added_shape) {
                                      added_shape->GetColor().b, kAlpha);
 
       }
-      total_error += std::pow(std::abs(new_pixels[row][col].GetRed() - orig_pixels[row][col].GetRed()), 2);
-      total_error += std::pow(std::abs(new_pixels[row][col].GetGreen() - orig_pixels[row][col].GetGreen()), 2);
-      total_error += std::pow(std::abs(new_pixels[row][col].GetBlue() - orig_pixels[row][col].GetBlue()), 2);
+      total_error += std::pow(new_pixels[row][col].GetRed() - orig_pixels[row][col].GetRed(), 2);
+      total_error += std::pow(new_pixels[row][col].GetGreen() - orig_pixels[row][col].GetGreen(), 2);
+      total_error += std::pow(new_pixels[row][col].GetBlue() - orig_pixels[row][col].GetBlue(), 2);
     }
   }
-  int skip_factor = skip_ * skip_;
-  double rms = std::pow(total_error / (orig_pixels.size()/skip_factor), .5);
+  double skip_factor = skip_ * skip_;
+  double rms = std::sqrt(total_error / ((orig_pixels.size() * orig_pixels[0].size())/skip_factor));
   return rms;
 }
 
 void Renderer::AddShapeToGeneratedImage(Shape *shape) {
   glm::vec2 loc = shape->GetLocation();
   std::vector<std::vector<Pixel>> pixels = generated_image_.GetPixelArray();
-  int row_start = 0; // if the shape is further left than the image
+  int row_start = 0; // if the shape starts further up than the image
   int col_start = 0;
-  if (loc.y > top_left_corner_.y) row_start = loc.y - top_left_corner_.y;   // if the shape's x starts on the image
+  if (loc.y > top_left_corner_.y) row_start = loc.y - top_left_corner_.y;   // if the shape's y starts on the image
   if (loc.x > top_left_corner_.x) col_start = loc.x - top_left_corner_.x;
 
   int row_end = 0;

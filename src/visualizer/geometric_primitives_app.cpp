@@ -20,7 +20,7 @@ void GeometricPrimitivesApp::update() {
     renderer_.AddShape();
     counter_++;
   } else {        // TEST
-    glm::vec2 string_pos(300,300);
+    glm::vec2 string_pos(350,350);
     std::string str = "DONE";
     ci::gl::drawStringCentered(str, string_pos, ci::ColorA(1,0,0,1));
   }
@@ -30,6 +30,8 @@ void GeometricPrimitivesApp::update() {
 void GeometricPrimitivesApp::draw() {
   ci::gl::enableAlphaBlending();
   renderer_.draw();
+  glm::vec2 string_pos(380,380);
+  ci::gl::drawStringCentered(std::to_string((int)counter_), string_pos, ci::ColorA(1,1,1,1));
 }
 
 void GeometricPrimitivesApp::UploadImage(const std::string& file_path) {
