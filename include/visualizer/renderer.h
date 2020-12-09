@@ -34,15 +34,16 @@ public:
   // adjust for accuracy/speed
   const float kSkipProportion = 0.00015;
   const double kMinError = 0.0000010;              // CHANGE
-  const size_t kMaxRandomShapeTries = 100;   // CHANGE
-  const size_t kMaxColorChanges = 200;       // CHANGE
-  const size_t kMaxMutations = 100;           // CHANGE
+  const size_t kMaxRandomShapeTries = 30;   // CHANGE
+  const size_t kMaxColorChanges = 50;       // CHANGE
+  const size_t kMaxMutations = 60;           // CHANGE
 
 private:
   ci::ColorA CalculateBackgroundColor();
 
   Shape* GenerateRandomShape();
   ci::ColorA GenerateRandomColor();
+  ci::ColorA CalculateAverageColor(glm::vec2 loc, vector<int> dim);
   glm::vec2 GenerateRandomLocation(int max_x, int max_y);
   vector<int> GenerateRandomShapeDimensions(glm::vec2& loc);
 

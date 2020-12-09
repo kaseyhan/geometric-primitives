@@ -40,8 +40,9 @@ void Renderer::draw() {
 
 void Renderer::AddShape() {
   Shape* shape = GenerateInitialShape();
-  AdjustShapeColor(shape);
   AdjustShapeSize(shape);
+//  ci::ColorA color = CalculateAverageColor(shape->GetLocation(),std::vector<int>{shape->GetWidth(),shape->GetHeight()});
+//  shape->SetColor(color);
 
   shapes_.push_back(shape);
   AddShapeToGeneratedImage(shape);
@@ -53,7 +54,7 @@ Shape* Renderer::GenerateInitialShape() {
   size_t counter = 0;
   do {
     Shape* random_shape = GenerateRandomShape();
-    double new_rms = CalculatePartialRootMeanSquare(random_shape);
+    double new_rms = CalculateRootMeanSquareFaster(random_shape);
     if (new_rms < rms) {
       rms = new_rms;
       delete shape;
@@ -95,10 +96,13 @@ void Renderer::AdjustShapeSize(Shape *shape) {
   do {
     int old_height = shape->GetHeight();
     int old_width = shape->GetWidth();
+    ci::ColorA old_color = shape->GetColor();
 //    shape->Mutate(max_width, max_height);
     std::vector<int> rand_dim = GenerateRandomShapeDimensions(loc);
     shape->SetWidth(rand_dim[0]);
     shape->SetHeight(rand_dim[1]);
+    ci::ColorA new_color = CalculateAverageColor(loc, rand_dim);
+    shape->SetColor(new_color);
     double new_rms = CalculatePartialRootMeanSquare(shape);
 
     if (new_rms < rms) {
@@ -106,6 +110,7 @@ void Renderer::AdjustShapeSize(Shape *shape) {
     } else {
       shape->SetHeight(old_height);
       shape->SetWidth(old_width);
+      shape->SetColor(old_color);
     }
     counter++;
   } while (rms > kMinError && counter < kMaxMutations);
@@ -139,11 +144,10 @@ ci::ColorA Renderer::CalculateBackgroundColor() {
 Shape* Renderer::GenerateRandomShape() {
   int max_x = original_image_.GetPixelArray()[0].size();
   int max_y = original_image_.GetPixelArray().size();
-//  ci::Rectf canvas(top_left_corner_, top_left_corner_ + glm::vec2(max_x, max_y));
 
-  ci::ColorA color = GenerateRandomColor();
   glm::vec2 loc = GenerateRandomLocation(max_x, max_y);
   std::vector<int> dimensions = GenerateRandomShapeDimensions(loc);
+  ci::ColorA color = CalculateAverageColor(loc, dimensions);
 
   return new Rectangle(loc, dimensions[0], dimensions[1], color);
 }
@@ -151,8 +155,35 @@ Shape* Renderer::GenerateRandomShape() {
 ci::ColorA Renderer::GenerateRandomColor() {
   std::uniform_real_distribution<float> rgb_value(0,1);
   static std::default_random_engine generator;
-
   return ci::ColorA(rgb_value(generator), rgb_value(generator), rgb_value(generator), kAlpha);
+}
+
+ci::ColorA Renderer::CalculateAverageColor(glm::vec2 loc, vector<int> dim) {
+  vector<vector<Pixel>> orig_pixels = original_image_.GetPixelArray();
+  float red_total = 0;
+  float green_total = 0;
+  float blue_total = 0;
+
+  size_t row_start = 0; // if the shape starts further up than the image
+  size_t col_start = 0;
+  if (loc.y > top_left_corner_.y) row_start = loc.y - top_left_corner_.y;      // if the shape's y starts on the image
+  if (loc.x > top_left_corner_.x) col_start = loc.x - top_left_corner_.x;
+  size_t row_end = std::min(orig_pixels.size(), ((unsigned int) loc.y + dim[1]));
+  size_t col_end = std::min(orig_pixels[0].size(), ((unsigned int) loc.x + dim[0]));
+
+  for (size_t row = row_start; row < row_end; row+= skip_/2) {
+    for (size_t col = col_start; col < col_end; col+= skip_/2) {
+      red_total += orig_pixels[row][col].GetRed();
+      green_total += orig_pixels[row][col].GetGreen();
+      blue_total += orig_pixels[row][col].GetBlue();
+    }
+  }
+
+  int skip_factor = std::pow((skip_/2),2);
+  float avg_red = red_total / (((row_end - row_start) * (col_end - col_start)) / skip_factor);
+  float avg_green = green_total / (((row_end - row_start) * (col_end - col_start)) / skip_factor);
+  float avg_blue = blue_total / (((row_end - row_start) * (col_end - col_start)) / skip_factor);
+  return ci::ColorA(avg_red, avg_green, avg_blue, kAlpha);
 }
 
 glm::vec2 Renderer::GenerateRandomLocation(int max_x, int max_y) {
@@ -168,17 +199,17 @@ std::vector<int> Renderer::GenerateRandomShapeDimensions(glm::vec2& loc) {
   int max_height = max_dim_;
 
   if (shapes_.size() > kNumShapes / 2) {
-    max_width /= 10;
-    max_height /= 10;
+    max_width /= 5;
+    max_height /= 5;
   } else if (shapes_.size() > kNumShapes / 5) {
-    max_width /= 7;
-    max_height /= 7;
-  } else if (shapes_.size() > kNumShapes / 10) {
     max_width /= 3;
     max_height /= 3;
+  } else if (shapes_.size() > kNumShapes / 10) {
+    max_width /= 1.8;
+    max_height /= 1.8;
   } else if (shapes_.size() > kNumShapes / 20) {
-    max_width /= 1.4;
-    max_height /= 1.4;
+    max_width /= 1.3;
+    max_height /= 1.3;
   }
 
   int min_width = max_width * (1 - shapes_.size() / kNumShapes) * 0.6;
@@ -298,7 +329,7 @@ double Renderer::CalculateRootMeanSquareFaster(Shape* added_shape) {
     }
   }
   double skip_factor = skip_ * skip_;
-  double rms = std::sqrt(total_error / ((orig_pixels.size() * orig_pixels[0].size())/skip_factor));
+  double rms = total_error / std::pow(((orig_pixels.size() * orig_pixels[0].size())/skip_factor),2);
   return rms;
 }
 

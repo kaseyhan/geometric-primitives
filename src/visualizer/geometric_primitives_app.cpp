@@ -19,15 +19,11 @@ void GeometricPrimitivesApp::update() {
   if (counter_ < kNumShapes) {
     renderer_.AddShape();
     counter_++;
-  } else {        // TEST
-    glm::vec2 string_pos(350,350);
-    std::string str = "DONE";
-    ci::gl::drawStringCentered(str, string_pos, ci::ColorA(1,0,0,1));
   }
-
 }
 
 void GeometricPrimitivesApp::draw() {
+  ci::gl::clear(ci::Color8u(0,0,0));
   ci::gl::enableAlphaBlending();
   renderer_.draw();
   glm::vec2 string_pos(380,380);
