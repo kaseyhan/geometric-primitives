@@ -21,6 +21,10 @@ public:
    * Generates random shapes until it creates one that has minimal error
    */
   void AddShape();
+
+  /*
+   * Sets the original image
+   */
   void SetOriginalImage(Image& original);
   void Clear();
 
@@ -29,9 +33,9 @@ public:
 
   // adjust for accuracy/speed
   const float kSkipProportion = 0.00015;
-  const double kMinError = 0.5;              // CHANGE
-  const size_t kMaxRandomShapeTries = 200;   // CHANGE
-  const size_t kMaxColorChanges = 50;       // CHANGE
+  const double kMinError = 1.000;              // CHANGE
+  const size_t kMaxRandomShapeTries = 210;   // CHANGE
+  const size_t kMaxColorChanges = 100;       // CHANGE
   const size_t kMaxMutations = 50;           // CHANGE
 
 private:
@@ -40,7 +44,7 @@ private:
   Shape* GenerateRandomShape();
   ci::ColorA GenerateRandomColor();
   glm::vec2 GenerateRandomLocation(int max_x, int max_y);
-  vector<int> GenerateRandomShapeDimensions(ci::Rectf& canvas, glm::vec2& loc);
+  vector<int> GenerateRandomShapeDimensions(glm::vec2& loc);
 
   double CalculateRootMeanSquare(Shape* added_shape);
   double CalculatePartialRootMeanSquare(Shape* added_shape);
