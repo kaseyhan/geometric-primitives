@@ -21,8 +21,8 @@ public:
   void UploadImage(const std::string& filename);
 
   const float kWindowSize = 400;
-  const size_t kNumShapes = 200;
-  const std::string kFilePath = "C:\\Users\\kjhan\\Desktop\\cinder_0.9.2_vc2015\\my-projects\\final-project-kaseyhan\\puppy.png";
+  const size_t kNumShapes = 150;
+  const std::string kFilePath = "C:\\Users\\kjhan\\Desktop\\cinder_0.9.2_vc2015\\my-projects\\final-project-kaseyhan\\calico_cat.png";
 
 private:
 

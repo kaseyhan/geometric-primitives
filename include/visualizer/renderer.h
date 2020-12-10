@@ -36,7 +36,7 @@ public:
   glm::vec2 GetTopLeftCorner();
   void SetGeneratedImage(Image& image); // for testing purposes
 
-  const size_t kNumShapes = 200;                   // number of shapes to generate
+  const size_t kNumShapes = 150;                   // number of shapes to generate
   const float kAlpha = 0.5;                        // alpha value (opacity) of the shapes
 
   // adjust for accuracy/speed
