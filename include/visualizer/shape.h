@@ -16,8 +16,10 @@ public:
 
   virtual int GetWidth() = 0;
   virtual void SetWidth(int new_width) = 0;
+
   virtual int GetHeight() = 0;
   virtual void SetHeight(int new_height) = 0;
+
   virtual ci::ColorA GetColor() = 0;
   virtual void SetColor(ci::ColorA& new_color) = 0;
 

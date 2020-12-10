@@ -23,6 +23,9 @@ public:
   void SetRGBA(float r, float g, float b, float a);
   void SetLocation(glm::vec2 new_loc);
 
+  /*
+   * Adds the given RGBA values to this Pixel's, taking alpha value into account
+   */
   void AddRGBA(float added_red, float added_green, float added_blue, float added_alpha);
 
 private:
@@ -30,6 +33,5 @@ private:
   float green_;
   float blue_;
   float alpha_;
-  glm::vec2 location_;
 };
 }

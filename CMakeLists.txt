@@ -65,7 +65,7 @@ list(APPEND SOURCE_FILES    ${CORE_SOURCE_FILES} src/visualizer/geometric_primit
 
 list(APPEND SOURCE_FILES    ${LODE_INCLUDE_DIR}/lodepng.cpp)
 
-list(APPEND TEST_FILES tests/test-main.cpp tests/test-pixel.cc)
+list(APPEND TEST_FILES tests/test-main.cpp tests/test-pixel.cc tests/test-renderer.cpp)
 
 
 FetchContent_Declare(

@@ -16,11 +16,13 @@ public:
   void SetLocation(glm::vec2& new_corner) override;
 
   int GetHeight() override;
+  void SetHeight(int new_height);
+
   int GetWidth() override;
+  void SetWidth(int new_width);
+
   ci::ColorA GetColor() override;
   void SetColor(ci::ColorA& new_color) override;
-  void SetHeight(int new_height);
-  void SetWidth(int new_width);
 
 private:
   glm::vec2 top_left_corner_;
