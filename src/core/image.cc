@@ -5,6 +5,12 @@
 namespace geometricprimitives {
 
 Image::Image() {}
-std::vector<std::vector<Pixel>> Image::GetPixelArray() const { return pixel_array_; }
+Image::Image(vector<vector<Pixel>> &pix_array) { pixel_array_ = pix_array; }
+
+vector<vector<Pixel>> Image::GetPixelArray() const { return pixel_array_; }
+
+void Image::SetPixelArray(vector<vector<Pixel>> &pix_array) {
+  pixel_array_ = pix_array;
+}
 
 }
