@@ -194,17 +194,17 @@ std::vector<int> Renderer::GenerateRandomShapeDimensions(glm::vec2& loc) {
   int max_height = max_dim_;
 
   if (shapes_.size() > kNumShapes / 2) {           // max dimensions are inversely related to the number of iterations;
-    max_width /= 4;                                //   larger shapes to cover broader areas in the beginning, smaller
-    max_height /= 4;                               //   shapes for details
+    max_width /= 6;                                //   larger shapes to cover broader areas in the beginning, smaller
+    max_height /= 6;                               //   shapes for details
   } else if (shapes_.size() > kNumShapes / 5) {
-    max_width /= 2.5;
-    max_height /= 2.5;
+    max_width /= 4;
+    max_height /= 4;
   } else if (shapes_.size() > kNumShapes / 10) {
-    max_width /= 1.8;
-    max_height /= 1.8;
+    max_width /= 2;
+    max_height /= 2;
   } else if (shapes_.size() > kNumShapes / 20) {
-    max_width /= 1.3;
-    max_height /= 1.3;
+    max_width /= 1.5;
+    max_height /= 1.5;
   }
 
   int min_width = max_width * (1 - shapes_.size() / kNumShapes) * 0.6;
@@ -215,8 +215,12 @@ std::vector<int> Renderer::GenerateRandomShapeDimensions(glm::vec2& loc) {
   if (loc.y < top_left_corner_.y) { min_height = top_left_corner_.y - loc.y + 5; } // if the shape starts above the image
 
   // preventing too much of the shape from extending off of the image
-  if (loc.x > (top_left_corner_.x + max_dim_) * 0.65) { max_width *= 0.3; }    // if the shape starts too far to the right
-  if (loc.y > (top_left_corner_.y + max_dim_) * 0.65) { max_height *= 0.3; }   // if the shape starts too far down
+//  if (loc.x > (top_left_corner_.x + max_dim_) * 0.65) { max_width *= 0.3; }    // if the shape starts too far to the right
+//  if (loc.y > (top_left_corner_.y + max_dim_) * 0.65) { max_height *= 0.3; }   // if the shape starts too far down
+
+  std::vector<std::vector<Pixel>> pixels = original_image_.GetPixelArray();
+  if (loc.x + max_width > top_left_corner_.x + pixels[0].size()) max_width = max_width - (loc.x - top_left_corner_.x) + 10;
+  if (loc.y + max_height > top_left_corner_.y + pixels.size()) max_height = max_height - (loc.y - top_left_corner_.y) + 10;
 
   // making sure that max > min
   if (min_width > max_width) { max_width += min_width - max_width + 5; }
